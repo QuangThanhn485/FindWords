@@ -26,10 +26,6 @@ function createlocalStorage() {
             "keywords",
             JSON.stringify({
                 search: [
-                    {
-                        keyWorld: null,
-                        color: null,
-                    },
                 ],
             })
         );
@@ -55,7 +51,7 @@ async function searchCustom(customItemKeyWords) {
 
 async function searching(itemKeyWords, contenInput) {
     let logResulns = [];
-    if (itemKeyWords != null) {
+    if (itemKeyWords) {
         await itemKeyWords.map((x) => {
             contenInput = contenInput.replaceAll(
                 RegExp(x.keyWorld, "gi"),
@@ -92,7 +88,7 @@ async function addingInfoResuln(logResulns) {
                 <hr class='new1'>
                 <ul style="flex-direction: column;">
                     <li>
-                    <strong>keyword :  </strong></nbsp>${itemObj.keySearch}
+                    <strong>key word :  </strong></nbsp>${itemObj.keySearch}
                     </li>
                     <li>
                     <strong>count total : </strong> ${itemObj.countResuln}
@@ -140,10 +136,10 @@ function removeResulnItem(indexItem, keyWorld) {
 function addingItemKeyWord() {
     createlocalStorage()
     keyWorldSearch.search =  getKeyWordsFromLocalStorage();
-    let world = inputAddingWords.value;
-    if (checkBeforeAddKeyWord(world)) {
+    let word = inputAddingWords.value;
+    if (checkBeforeAddKeyWord(word)) {
         keyWorldSearch.search = keyWorldSearch.search.concat({
-            keyWorld: world,
+            keyWorld: word,
             color: inputAddingColor.value,
         });
         localStorage.removeItem("keywords");
@@ -151,27 +147,50 @@ function addingItemKeyWord() {
         searchAll();
     }
 }
+function removeAllItemsKeyWords()
+{
+    const response = confirm("do you want to remove all keywords");
+    if(response)
+    {
+        createlocalStorage();
+        localStorage.setItem("keywords", JSON.stringify({
+            search: [
+            ],
+        }));
+    }
+    searchAll();
+}
 
-function checkBeforeAddKeyWord(world) {
+function checkBeforeAddKeyWord(word) {
     let listSearch = getKeyWordsFromLocalStorage();
     let resuln = true;
-    let keyWorld = listSearch.filter((x) => x.keyWorld === world);
-    if (world === "") {
+    let keyWorld = listSearch.filter((x) => x.keyWorld === word);
+    if (word === "" || justSpace(word) ) {
         resuln = false;
         alert("this value key word can't empty !");
     }
-    if (containsSpecialChars(world)) {
+    if (containsSpecialChars(word)) {
         resuln = false;
         alert("key word don't allow Special Characters !");
     }
     if (keyWorld.length != 0) {
         resuln = false;
-        alert("this key world realy exist !");
+        alert("this key word realy exist !");
     }
     return resuln;
 }
+
+function justSpace(str){
+    let resuln = false;
+    let arr =  str.split('').filter((x)=> x != " ");
+    if(arr.length === 0){
+        resuln = true;
+    }
+    return resuln;
+}
+
 function containsSpecialChars(str) {
-    const specialChars = `\`!@#$%^&*() _+\-=\[\]{};':"\\|,.<>\/?~`;
+    const specialChars = `\`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~`;
 
     const result = specialChars.split("").some((specialChar) => {
         if (str.includes(specialChar)) {
